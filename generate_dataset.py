@@ -2,15 +2,17 @@ import json
 import hashlib
 import random
 import itertools
+from dataclasses import dataclass
+from typing import Any, Callable
 
+@dataclass
 class TemplateDef:
-    def __init__(self, name, tags, prompts, thinking, code, generator):
-        self.name = name
-        self.tags = tags
-        self.prompts = prompts
-        self.thinking = thinking
-        self.code = code
-        self.generator = generator
+    name: str
+    tags: list[str]
+    prompts: list[str]
+    thinking: str
+    code: Any
+    generator: Callable
 
 TEMPLATES = []
 
