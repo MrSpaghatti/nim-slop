@@ -1491,7 +1491,7 @@ register_template("stdlib_multi_csv", ["stdlib", "os", "parsecsv", "strutils", "
     multi2_code, multi2_gen)
 
 def generate_examples(target_total=3000):
-    seen_code_hashes = set()
+    seen_codes = set()
     examples = []
 
     if not TEMPLATES:
@@ -1520,9 +1520,8 @@ def generate_examples(target_total=3000):
             else:
                 code = t.code.format(**p)
 
-            code_hash = hashlib.sha256(code.encode('utf-8')).hexdigest()
-            if code_hash not in seen_code_hashes:
-                seen_code_hashes.add(code_hash)
+            if code not in seen_codes:
+                seen_codes.add(code)
                 examples.append({
                     "prompt": prompt,
                     "thinking": thinking,
