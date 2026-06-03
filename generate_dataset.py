@@ -1498,8 +1498,6 @@ def generate_examples(target_total=3000):
         print("No templates found.")
         return examples
 
-    perms_per_template = 3000
-
     for t in TEMPLATES:
         perms = list(t.generator())
         random.shuffle(perms)
