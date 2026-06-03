@@ -14,8 +14,8 @@ class TemplateDef:
 
 TEMPLATES = []
 
-def register_template(name, tags, prompts, thinking, code, generator):
-    TEMPLATES.append(TemplateDef(name, tags, prompts, thinking, code, generator))
+def register_template(template):
+    TEMPLATES.append(template)
 
 # -------- TEMPLATES --------
 
@@ -27,7 +27,7 @@ def object_gen():
     for t1, obj, f1, f2 in itertools.product(types, obj_names, field1_names, field2_names):
         yield {"type": t1, "obj_name": obj, "field1": f1, "field2": f2}
 
-register_template(
+register_template(TemplateDef(
     "basic_syntax_object", ["basic", "object"],
     [
         "Write a Nim program that defines a {obj_name} object with {field1} and {field2} fields.",
@@ -48,7 +48,7 @@ when isMainModule:
   var item = new{obj_name}(default({type}), "example")
   echo item.{field1}
   echo item.{field2}
-""", object_gen)
+""", object_gen))
 
 def enum_gen():
     enum_names = ["Status", "State", "Role", "Level", "Direction", "Mode"]
@@ -58,7 +58,7 @@ def enum_gen():
     for en, v1, v2, v3 in itertools.product(enum_names, val1, val2, val3):
         yield {"enum_name": en, "v1": v1, "v2": v2, "v3": v3}
 
-register_template("basic_syntax_enum", ["basic", "enum", "case"],
+register_template(TemplateDef("basic_syntax_enum", ["basic", "enum", "case"],
     [
         "Write a Nim program that defines an enum called {enum_name} with values {v1}, {v2}, and {v3}.",
         "Create a Nim module using an enum {enum_name} ({v1}, {v2}, {v3}) and a case statement.",
@@ -79,7 +79,7 @@ proc handle{enum_name}*(state: {enum_name}): string =
 when isMainModule:
   for s in {enum_name}:
     echo handle{enum_name}(s)
-""", enum_gen)
+""", enum_gen))
 
 def tuple_gen():
     tup_names = ["Point", "Result", "Pair", "Bounds", "Entry", "Record"]
@@ -90,7 +90,7 @@ def tuple_gen():
     for tname, t1, t2, f1, f2 in itertools.product(tup_names, types1, types2, f1_names, f2_names):
         yield {"tup_name": tname, "t1": t1, "t2": t2, "f1": f1, "f2": f2}
 
-register_template("basic_syntax_tuple", ["basic", "tuple"],
+register_template(TemplateDef("basic_syntax_tuple", ["basic", "tuple"],
     [
         "Write a Nim program defining a named tuple {tup_name} with fields {f1} ({t1}) and {f2} ({t2}).",
         "Create a Nim module that returns a named tuple {tup_name} containing {f1} and {f2}.",
@@ -113,7 +113,7 @@ when isMainModule:
 
   echo "Tuple field 1: ", {f1}
   echo "Tuple field 2: ", {f2}
-""", tuple_gen)
+""", tuple_gen))
 
 def string_gen():
     funcs = ["split", "replace", "strip", "toUpperAscii", "toLowerAscii"]
@@ -145,7 +145,7 @@ when isMainModule:
   echo processString(sample)
 """
 
-register_template("stdlib_strutils", ["stdlib", "strutils"],
+register_template(TemplateDef("stdlib_strutils", ["stdlib", "strutils"],
     [
         "Write a Nim program that uses strutils to {func} a string containing '{word}'.",
         "Create a Nim script showing strutils {func} and separating by '{sep}'.",
@@ -153,7 +153,7 @@ register_template("stdlib_strutils", ["stdlib", "strutils"],
         "Build a module that processes a string with '{word}' using strutils {func}."
     ],
     "This example uses the `strutils` module for string manipulation. We apply `{func}` to process a string containing `{word}`. `strutils` provides many efficient string operations out of the box.",
-    str_code, string_gen)
+    str_code, string_gen))
 
 def sequtils_gen():
     types = ["int", "float", "string"]
@@ -215,7 +215,7 @@ when isMainModule:
   processData(s)
 """
 
-register_template("stdlib_sequtils", ["stdlib", "sequtils"],
+register_template(TemplateDef("stdlib_sequtils", ["stdlib", "sequtils"],
     [
         "Write a Nim program demonstrating sequtils {op} on a sequence of {type}.",
         "Create a Nim module using {op} from sequtils with {type} data.",
@@ -223,7 +223,7 @@ register_template("stdlib_sequtils", ["stdlib", "sequtils"],
         "Build a script that filters or maps a seq[{type}] using {op}."
     ],
     "This program demonstrates functional-style sequence operations using `sequtils`. We use the `{op}` macro/template to concisely process a `seq[{type}]`. `sequtils` is essential for idiomatic data transformation in Nim.",
-    seq_code, sequtils_gen)
+    seq_code, sequtils_gen))
 
 def tables_gen():
     k_types = ["string", "int"]
@@ -232,7 +232,7 @@ def tables_gen():
     for k, v, tname in itertools.product(k_types, v_types, table_names):
         yield {"ktype": k, "vtype": v, "tname": tname, "tname_cap": tname.capitalize()}
 
-register_template("stdlib_tables", ["stdlib", "tables"],
+register_template(TemplateDef("stdlib_tables", ["stdlib", "tables"],
     [
         "Write a Nim program using a Table[{ktype}, {vtype}] called {tname}.",
         "Create a Nim module defining a {tname} lookup Table with {ktype} keys and {vtype} values.",
@@ -266,7 +266,7 @@ when isMainModule:
 
   manager.addEntry(k, v)
   echo manager.getEntry(k)
-""", tables_gen)
+""", tables_gen))
 
 def math_gen():
     funcs = ["sin", "cos", "tan", "sqrt", "cbrt"]
@@ -274,7 +274,7 @@ def math_gen():
     for f, n in itertools.product(funcs, nums):
         yield {"func": f, "num": n}
 
-register_template("stdlib_math", ["stdlib", "math"],
+register_template(TemplateDef("stdlib_math", ["stdlib", "math"],
     [
         "Write a Nim program using std/math to compute the {func} of {num}.",
         "Create a script demonstrating the math {func} function on the value {num}.",
@@ -291,7 +291,7 @@ when isMainModule:
   let v = {num}
   let res = computeValue(v)
   echo "Result: ", res
-""", math_gen)
+""", math_gen))
 
 def times_gen():
     ops = ["now", "utc", "getLocalTime", "getTime"]
@@ -320,7 +320,7 @@ when isMainModule:
   echo getFormattedTime()
 """
 
-register_template("stdlib_times", ["stdlib", "times"],
+register_template(TemplateDef("stdlib_times", ["stdlib", "times"],
     [
         "Write a Nim program using std/times to get {op} and format it as '{fmt}'.",
         "Create a time utility in Nim that calls {op} and formats the result with '{fmt}'.",
@@ -328,7 +328,7 @@ register_template("stdlib_times", ["stdlib", "times"],
         "Build a Nim module demonstrating std/times with {op} and format '{fmt}'."
     ],
     "This program demonstrates the `times` module for date and time manipulation. We retrieve the current time using `{op}()` and format it into a string using the pattern `{fmt}`. This is useful for logging and displaying timestamps.",
-    times_code, times_gen)
+    times_code, times_gen))
 
 def random_gen():
     funcs = ["rand", "sample", "shuffle", "randomize"]
@@ -372,7 +372,7 @@ when isMainModule:
   echo generateRandomData()
 """
 
-register_template("stdlib_random", ["stdlib", "random"],
+register_template(TemplateDef("stdlib_random", ["stdlib", "random"],
     [
         "Write a Nim program using std/random to demonstrate {func} with {type} up to {bound}.",
         "Create a script generating a random {type} using {func}({bound}) from the random module.",
@@ -380,7 +380,7 @@ register_template("stdlib_random", ["stdlib", "random"],
         "Build a Nim module that initializes the RNG and uses {func} to get a {type} value."
     ],
     "This example uses the `random` standard library module. We first call `randomize()` to seed the RNG with the current time, ensuring different results across runs. Then we use `{func}` to generate or manipulate random data.",
-    rand_code, random_gen)
+    rand_code, random_gen))
 
 def sets_gen():
     ops = ["incl", "excl", "contains", "union", "intersection"]
@@ -427,7 +427,7 @@ when isMainModule:
   echo "Set size: ", finalSet.len
 """
 
-register_template("stdlib_sets", ["stdlib", "sets"],
+register_template(TemplateDef("stdlib_sets", ["stdlib", "sets"],
     [
         "Write a Nim program managing a HashSet[{type}] named {name} and using {op}.",
         "Create a script that uses std/sets to define a {name} set and performs {op}.",
@@ -435,7 +435,7 @@ register_template("stdlib_sets", ["stdlib", "sets"],
         "Build a module defining a {name} set of {type}s, showcasing the {op} method."
     ],
     "This program demonstrates `std/sets` for managing collections of unique items. We create a `HashSet[{type}]` named `{name}`. The `{op}` operation is used to modify or query the set. Sets are ideal for membership testing and deduplication.",
-    sets_code, sets_gen)
+    sets_code, sets_gen))
 
 def streams_gen():
     stream_types = ["FileStream", "StringStream"]
@@ -477,7 +477,7 @@ when isMainModule:
   processStream("Sample Stream Data\\nLine 2")
 """
 
-register_template("stdlib_streams", ["stdlib", "streams"],
+register_template(TemplateDef("stdlib_streams", ["stdlib", "streams"],
     [
         "Write a Nim program using std/streams to create a {stype} and use {op}.",
         "Create a script demonstrating {stype} from std/streams with the {op} operation.",
@@ -485,7 +485,7 @@ register_template("stdlib_streams", ["stdlib", "streams"],
         "Build a Nim module that initializes a {stype} as {vname} and performs a {op}."
     ],
     "This example covers the `streams` module, providing a unified interface for reading and writing data. We create a `{stype}` called `{vname}` and perform the `{op}` operation. Streams are crucial for efficient I/O operations.",
-    streams_code, streams_gen)
+    streams_code, streams_gen))
 
 def re_gen():
     funcs = ["match", "findAll", "replace", "split"]
@@ -524,7 +524,7 @@ when isMainModule:
   echo matches
 """
 
-register_template("stdlib_re", ["stdlib", "re"],
+register_template(TemplateDef("stdlib_re", ["stdlib", "re"],
     [
         "Write a Nim program using std/re to {func} the pattern `{pattern}`.",
         "Create a script demonstrating regex in Nim with std/re, {func}, and pattern `{pattern}`.",
@@ -532,7 +532,7 @@ register_template("stdlib_re", ["stdlib", "re"],
         "Build a module parsing strings with std/re's {func} and the regular expression `{pattern}`."
     ],
     "This program demonstrates regular expressions in Nim using the `re` module (PCRE wrapper). We use the `{func}` procedure with the pattern `{pattern}` and flags `{flags}`. Regex is powerful for complex string matching and extraction.",
-    re_code, re_gen)
+    re_code, re_gen))
 
 def parseopt_gen():
     kinds = ["cmdShortOption", "cmdLongOption", "cmdArgument"]
@@ -579,7 +579,7 @@ when isMainModule:
   parseArgs()
 """
 
-register_template("stdlib_parseopt", ["stdlib", "parseopt", "cli"],
+register_template(TemplateDef("stdlib_parseopt", ["stdlib", "parseopt", "cli"],
     [
         "Write a Nim program parsing CLI arguments with std/parseopt checking for {kind}.",
         "Create a script using parseopt in Nim to handle -{flag} and --{long_flag}.",
@@ -587,7 +587,7 @@ register_template("stdlib_parseopt", ["stdlib", "parseopt", "cli"],
         "Build a module that initializes an OptParser and matches -{flag} or --{long_flag}."
     ],
     "This code uses the `parseopt` module to parse command-line arguments. We create an `OptParser` and iterate through the tokens. By checking `kind` (like `{kind}`) and `key` (like `{flag}` or `{long_flag}`), we can safely extract flags and arguments.",
-    opt_code, parseopt_gen)
+    opt_code, parseopt_gen))
 def unittest_gen():
     modules = ["MathOps", "StrHelpers", "DataStore", "Parser", "Config", "Server"]
     funcs = ["calculate", "process", "validate", "transform", "init", "start"]
@@ -641,7 +641,7 @@ suite "{p['module']} Tests":
     check {p['func']}({edge_arg}) == {edge_val}
 """
 
-register_template("testing_unittest", ["testing", "unittest"],
+register_template(TemplateDef("testing_unittest", ["testing", "unittest"],
     [
         "Write a Nim program using std/unittest to test {module}.{func} handling {type}.",
         "Create a unittest suite in Nim for a module {module} and its {func} proc returning {type}.",
@@ -649,7 +649,7 @@ register_template("testing_unittest", ["testing", "unittest"],
         "Build Nim unit tests for {module} focusing on the {func} procedure with {type} data."
     ],
     "This example demonstrates testing in Nim using the `unittest` module. We define a `suite` containing `test` blocks. We use `check` for standard assertions and `require` when a test should abort immediately on failure.",
-    unit_code, unittest_gen)
+    unit_code, unittest_gen))
 
 def runnable_gen():
     modules = ["StringUtils", "MathUtils", "PathUtils", "CryptoUtils", "JsonUtils", "HttpUtils"]
@@ -658,7 +658,7 @@ def runnable_gen():
     for m, f, a in itertools.product(modules, funcs, args):
         yield {"module": m, "func": f, "arg": a}
 
-register_template("testing_runnable", ["testing", "runnableExamples"],
+register_template(TemplateDef("testing_runnable", ["testing", "runnableExamples"],
     [
         "Write a Nim module {module} with runnableExamples for {func} using {arg}.",
         "Create a Nim proc {func} in {module} that includes documentation with runnableExamples showing {arg}.",
@@ -688,7 +688,7 @@ proc {func}*({arg}: string): string =
 
 when isMainModule:
   echo {func}("test")
-""", runnable_gen)
+""", runnable_gen))
 def generics_gen():
     types1 = ["int", "float", "string"]
     types2 = ["bool", "char", "int"]
@@ -697,7 +697,7 @@ def generics_gen():
     for t1, t2, s, f in itertools.product(types1, types2, structs, funcs):
         yield {"t1": t1, "t2": t2, "struct": s, "func": f}
 
-register_template("advanced_generics", ["advanced", "generics"],
+register_template(TemplateDef("advanced_generics", ["advanced", "generics"],
     [
         "Write a Nim program demonstrating generics with a {struct}[T, U] instantiated with {t1} and {t2}.",
         "Create a generic {struct} object in Nim and a {func} proc handling {t1} and {t2}.",
@@ -717,7 +717,7 @@ when isMainModule:
   let c = {struct}[{t1}, {t2}](first: default({t1}), second: default({t2}))
   let res = {func}(c)
   echo "Processed: ", res
-""", generics_gen)
+""", generics_gen))
 
 def concept_gen():
     concepts = ["Serializable", "Comparable", "Drawable", "Printable", "Movable"]
@@ -726,7 +726,7 @@ def concept_gen():
     for c, t, f in itertools.product(concepts, types, funcs):
         yield {"concept": c, "type": t, "func": f}
 
-register_template("advanced_concept", ["advanced", "concept"],
+register_template(TemplateDef("advanced_concept", ["advanced", "concept"],
     [
         "Write a Nim program defining a {concept} concept and applying it to {type}.",
         "Create a Nim script using concepts to constrain a generic type to {concept}.",
@@ -747,7 +747,7 @@ proc processConcept*(item: {concept}) =
 when isMainModule:
   let v: {type} = default({type})
   processConcept(v)
-""", concept_gen)
+""", concept_gen))
 
 def static_gen():
     sizes = ["10", "16", "32", "64", "100"]
@@ -756,7 +756,7 @@ def static_gen():
     for s, t, st in itertools.product(sizes, types, structs):
         yield {"size": s, "type": t, "struct": st}
 
-register_template("advanced_static", ["advanced", "static[T]"],
+register_template(TemplateDef("advanced_static", ["advanced", "static[T]"],
     [
         "Write a Nim program using static[T] to define a {struct} with fixed size {size}.",
         "Create a generic {struct} in Nim parameterized by a static integer {size}.",
@@ -777,7 +777,7 @@ proc getSize*[N: static[int], T](b: {struct}[N, T]): int =
 when isMainModule:
   let item = new{struct}[{size}, {type}]()
   echo "Size is strictly bounded at compile time: ", item.getSize()
-""", static_gen)
+""", static_gen))
 def pragmas_gen():
     pragmas = ["inline", "noSideEffect", "raises: []", "tags: []", "discardable"]
     funcs = ["calculate", "process", "validate", "runOp"]
@@ -808,7 +808,7 @@ when isMainModule:
 {call}
 """
 
-register_template("advanced_pragmas", ["advanced", "pragmas"],
+register_template(TemplateDef("advanced_pragmas", ["advanced", "pragmas"],
     [
         "Write a Nim program demonstrating the {{.{pragma}.}} pragma on a {func} proc returning {type}.",
         "Create a script using the {pragma} pragma to annotate a {func} function in Nim.",
@@ -816,7 +816,7 @@ register_template("advanced_pragmas", ["advanced", "pragmas"],
         "Build a module showcasing Nim's pragmas by applying {pragma} to {func}."
     ],
     "This example demonstrates pragmas in Nim, which instruct the compiler to perform specific checks or optimizations. Here, we apply `{{.{pragma}.}}` to the `{func}` procedure. Pragmas are essential for writing robust, high-performance Nim code.",
-    pragma_code, pragmas_gen)
+    pragma_code, pragmas_gen))
 
 def when_gen():
     conditions = ["defined(release)", "defined(windows)", "NimMajor >= 2", "hostOS == \"linux\""]
@@ -825,7 +825,7 @@ def when_gen():
     for c, t, f in itertools.product(conditions, true_branches, false_branches):
         yield {"cond": c, "true_b": t, "false_b": f}
 
-register_template("advanced_when", ["advanced", "when"],
+register_template(TemplateDef("advanced_when", ["advanced", "when"],
     [
         "Write a Nim program using `when` for conditional compilation based on {cond}.",
         "Create a script demonstrating compile-time branches using `when {cond}`.",
@@ -841,7 +841,7 @@ register_template("advanced_when", ["advanced", "when"],
 
 when isMainModule:
   performAction()
-""", when_gen)
+""", when_gen))
 
 def destruct_gen():
     structs = ["FileWrapper", "DBConnection", "SocketHandle", "NativePtr"]
@@ -850,7 +850,7 @@ def destruct_gen():
     for s, r, o in itertools.product(structs, res_names, ops):
         yield {"struct": s, "res": r, "op": o}
 
-register_template("memory_destructor", ["memory", "destructor", "=destroy"],
+register_template(TemplateDef("memory_destructor", ["memory", "destructor", "=destroy"],
     [
         "Write a Nim program implementing `=destroy` and `=copy` for a {struct} managing a {res}.",
         "Create a custom destructor for a {struct} object in Nim to clean up {res}.",
@@ -881,7 +881,7 @@ when isMainModule:
     let item = new{struct}()
     item.{op}()
   # item is destroyed here
-""", destruct_gen)
+""", destruct_gen))
 
 def move_gen():
     types = ["string", "seq[int]", "seq[string]"]
@@ -916,7 +916,7 @@ when isMainModule:
 {main_call}
 """
 
-register_template("memory_move", ["memory", "move", "sink"],
+register_template(TemplateDef("memory_move", ["memory", "move", "sink"],
     [
         "Write a Nim program demonstrating move semantics with {op} on a {type} variable {var}.",
         "Create a script that uses {op} to optimize memory transfer of a {type} in Nim.",
@@ -924,7 +924,7 @@ register_template("memory_move", ["memory", "move", "sink"],
         "Build a Nim module showing how to use the {op} feature for {type} with a sink parameter."
     ],
     "This example uses Nim's move semantics (`{op}` and `sink` parameters). When working with large structures like `{type}`, copying can be expensive. Using `{op}` or a `sink` parameter transfers ownership of `{var}` without deep copying, offering zero-overhead abstractions.",
-    move_code, move_gen)
+    move_code, move_gen))
 def importc_gen():
     funcs = ["puts", "sqrt", "abs", "strlen", "malloc"]
     headers = ["<stdio.h>", "<math.h>", "<stdlib.h>", "<string.h>"]
@@ -932,7 +932,7 @@ def importc_gen():
     for f, h, t in itertools.product(funcs, headers, types):
         yield {"func": f, "header": h, "type": t}
 
-register_template("ffi_importc", ["ffi", "importc", "header"],
+register_template(TemplateDef("ffi_importc", ["ffi", "importc", "header"],
     [
         "Write a Nim program that uses {{.importc, header: \"{header}\".}} to call {func}.",
         "Create an FFI wrapper in Nim for the C function {func} from {header} returning {type}.",
@@ -951,7 +951,7 @@ when isMainModule:
   # In a real environment, you'd pass meaningful data.
   # Here we just show the structure of the FFI binding.
   echo "FFI binding for {func} defined successfully."
-""", importc_gen)
+""", importc_gen))
 
 def exportc_gen():
     funcs = ["nim_process", "nim_init", "nim_calculate"]
@@ -980,7 +980,7 @@ when isMainModule:
   echo "Exported function {func} ready for linking."
 """
 
-register_template("ffi_exportc", ["ffi", "exportc", "dynlib"],
+register_template(TemplateDef("ffi_exportc", ["ffi", "exportc", "dynlib"],
     [
         "Write a Nim program exporting a {func} proc to C using {{.exportc, {conv}.}}.",
         "Create a script that exposes a Nim procedure {func} returning {type} to a C program.",
@@ -988,7 +988,7 @@ register_template("ffi_exportc", ["ffi", "exportc", "dynlib"],
         "Build a module demonstrating {{.exportc.}} for `{func}` to be called from C."
     ],
     "This code demonstrates how to expose Nim code to C or other languages. We use the `{{.exportc.}}` pragma to prevent Nim's name mangling for `{func}`, and `{conv}` to specify the C calling convention. This allows the Nim procedure returning `{type}` to be easily linked into external C projects.",
-    export_code, exportc_gen)
+    export_code, exportc_gen))
 
 def ast_gen():
     node_types = ["nnkStmtList", "nnkCall", "nnkIdent", "nnkStrLit"]
@@ -1030,7 +1030,7 @@ when isMainModule:
     let x = 10
 """
 
-register_template("macros_ast", ["macros", "ast", "untyped"],
+register_template(TemplateDef("macros_ast", ["macros", "ast", "untyped"],
     [
         "Write a Nim macro `{mname}` that manipulates AST nodes, focusing on {node} and {op}.",
         "Create a script demonstrating AST traversal in Nim using a macro `{mname}` that checks for {node}.",
@@ -1038,7 +1038,7 @@ register_template("macros_ast", ["macros", "ast", "untyped"],
         "Build a module showcasing std/macros by defining `{mname}` to inspect a {node}."
     ],
     "This example delves into Nim's metaprogramming by writing a macro `{mname}`. Macros operate directly on the Abstract Syntax Tree (AST). We use the `macros` module to inspect or create nodes like `{node}` and perform operations like `{op}`. This enables powerful code generation at compile time.",
-    ast_code, ast_gen)
+    ast_code, ast_gen))
 
 def dsl_gen():
     dsl_names = ["htmlBuilder", "sqlQuery", "stateMachine", "configParser"]
@@ -1047,7 +1047,7 @@ def dsl_gen():
     for dn, kw, act in itertools.product(dsl_names, keywords, actions):
         yield {"dsl": dn, "kw": kw, "act": act}
 
-register_template("macros_dsl", ["macros", "dsl", "quote"],
+register_template(TemplateDef("macros_dsl", ["macros", "dsl", "quote"],
     [
         "Write a Nim macro creating a `{dsl}` domain-specific language that handles `{kw}` blocks.",
         "Create a script using a `{dsl}` macro to parse a custom `{kw}` mini-language and {act} it.",
@@ -1078,7 +1078,7 @@ when isMainModule:
   {dsl}:
     {kw}("example_data")
     echo "Normal Nim code still works"
-""", dsl_gen)
+""", dsl_gen))
 
 def pragma_gen():
     pragmas = ["route", "injectLogger", "benchmark", "validateProps"]
@@ -1111,7 +1111,7 @@ when isMainModule:
 {main_body}
 """
 
-register_template("macros_pragma", ["macros", "custom_pragma"],
+register_template(TemplateDef("macros_pragma", ["macros", "custom_pragma"],
     [
         "Write a custom pragma macro `{{.{pragma}.}}` in Nim taking {arg} as an argument.",
         "Create a script defining a macro that acts as a custom pragma `{pragma}` for a {target}.",
@@ -1119,7 +1119,7 @@ register_template("macros_pragma", ["macros", "custom_pragma"],
         "Build a module using std/macros to define a custom `{pragma}` pragma applied to a {target}."
     ],
     "This example shows how to write a custom pragma macro in Nim. The `{pragma}` macro intercepts the declaration of a `{target}` and rewrites its AST. This allows us to inject code (like logging or registration) based on the argument `{arg}` without cluttering the business logic.",
-    macros_pragma_code, pragma_gen)
+    macros_pragma_code, pragma_gen))
 
 def type_traits_gen():
     types = ["int", "string", "float", "seq[int]", "Table[string, int]"]
@@ -1150,7 +1150,7 @@ when isMainModule:
   reflectType()
 """
 
-register_template("macros_typetraits", ["macros", "typetraits"],
+register_template(TemplateDef("macros_typetraits", ["macros", "typetraits"],
     [
         "Write a Nim program using std/typetraits to get the {op} of {type}.",
         "Create a script that reflects on {type} using typetraits {op}.",
@@ -1158,7 +1158,7 @@ register_template("macros_typetraits", ["macros", "typetraits"],
         "Build a Nim module demonstrating typetraits on {type} with the {op} proc."
     ],
     "This program demonstrates metaprogramming via type introspection using `std/typetraits`. The `{op}` procedure provides compile-time information about `{type}`, which is useful for generic programming and macros.",
-    tt_code, type_traits_gen)
+    tt_code, type_traits_gen))
 
 def bind_sym_gen():
     funcs = ["echo", "inc", "dec", "add"]
@@ -1166,7 +1166,7 @@ def bind_sym_gen():
     for f, a in itertools.product(funcs, args):
         yield {"func": f, "arg": a}
 
-register_template("macros_bindsym", ["macros", "bindSym"],
+register_template(TemplateDef("macros_bindsym", ["macros", "bindSym"],
     [
         "Write a Nim macro that uses `bindSym` to safely call `{func}` with {arg}.",
         "Create a macro in Nim demonstrating hygienic symbol binding with `bindSym(\"{func}\")`.",
@@ -1185,7 +1185,7 @@ when isMainModule:
     callSafely({arg})
   else:
     echo "Argument type mismatch for {func}, but macro expansion worked."
-""", bind_sym_gen)
+""", bind_sym_gen))
 def async_gen():
     modules = ["asyncdispatch", "chronos"]
     ops = ["sleepAsync", "readAsync", "writeAsync", "connect"]
@@ -1226,7 +1226,7 @@ when isMainModule:
 {main_call}
 """
 
-register_template("async_core", ["async", "await", "asyncdispatch"],
+register_template(TemplateDef("async_core", ["async", "await", "asyncdispatch"],
     [
         "Write a Nim program using {mod} defining an async proc returning {ret} and using {op}.",
         "Create a script demonstrating async/await in Nim via {mod} calling {op}.",
@@ -1234,7 +1234,7 @@ register_template("async_core", ["async", "await", "asyncdispatch"],
         "Build a module that uses `{{.async.}}` with {mod} to perform {op} non-blocking."
     ],
     "This example uses the `{mod}` module for asynchronous programming in Nim. We define a procedure with the `{{.async.}}` pragma. The `await` keyword is used to yield control back to the event loop while waiting for `{op}` to complete. This is crucial for I/O-bound tasks.",
-    async_code, async_gen)
+    async_code, async_gen))
 
 def http_gen():
     methods = ["getContent", "postContent", "request"]
@@ -1286,7 +1286,7 @@ when isMainModule:
     echo "Network error occurred, which is expected in a disconnected environment."
 """
 
-register_template("async_http", ["async", "httpclient", "networking"],
+register_template(TemplateDef("async_http", ["async", "httpclient", "networking"],
     [
         "Write a Nim program using std/httpclient to make a {method} request to {url}.",
         "Create an HTTP client in Nim that fetches data from {url} using {method}.",
@@ -1294,7 +1294,7 @@ register_template("async_http", ["async", "httpclient", "networking"],
         "Build a module demonstrating std/httpclient making a request to {url}."
     ],
     "This code demonstrates making network requests using `std/httpclient`. Based on the configuration (`async: {is_async}`), we instantiate either an `HttpClient` or an `AsyncHttpClient`. We then perform a `{method}` request to `{url}` and read the response.",
-    http_code, http_gen)
+    http_code, http_gen))
 
 def async_streams_gen():
     modes = ["fmRead", "fmWrite"]
@@ -1331,7 +1331,7 @@ when isMainModule:
   waitFor processFile()
 """
 
-register_template("async_file", ["async", "asyncfile"],
+register_template(TemplateDef("async_file", ["async", "asyncfile"],
     [
         "Write a Nim program using std/asyncfile to {op} a file {file} async.",
         "Create an async script reading/writing {file} in mode {mode} via asyncfile.",
@@ -1339,7 +1339,7 @@ register_template("async_file", ["async", "asyncfile"],
         "Build a module demonstrating asynchronous file access on {file}."
     ],
     "This example uses `std/asyncfile` for asynchronous file operations. We open the file `{file}` in `{mode}` mode. Then we perform `{op}` asynchronously, using `await`. This is vital for high-performance servers where blocking disk I/O would stall the event loop.",
-    ast_streams_code, async_streams_gen)
+    ast_streams_code, async_streams_gen))
 
 def async_gen_more():
     modules = ["asyncdispatch", "chronos"]
@@ -1380,14 +1380,14 @@ when isMainModule:
   discard waitFor runLoop()
 """
 
-register_template("async_loop", ["async", "await", "loop", "asyncdispatch"],
+register_template(TemplateDef("async_loop", ["async", "await", "loop", "asyncdispatch"],
     [
         "Write a Nim program looping {loop} times in an async proc with {mod} returning {ret} and using {op}.",
         "Create a script demonstrating async loops in Nim via {mod} calling {op} {loop} times.",
         "Implement a recurring async task in Nim using {mod} and yielding {ret} from {op} ({loop} iterations)."
     ],
     "This example uses the `{mod}` module for a looping asynchronous task. We define a procedure with the `{{.async.}}` pragma and loop `{loop}` times. The `await` keyword yields control back to the event loop on each iteration. This is a common pattern for background workers.",
-    async_more_code, async_gen_more)
+    async_more_code, async_gen_more))
 def multi_gen():
     files = ["data.json", "config.json", "settings.json", "input.json", "output.json"]
     dirs = ["/tmp", "/var/lib", "/opt/app", "~/.config", "./data"]
@@ -1396,7 +1396,7 @@ def multi_gen():
     for f, d, t, fu in itertools.product(files, dirs, types, funcs):
         yield {"file": f, "dir": d, "type": t, "func": fu}
 
-register_template("stdlib_multi5", ["stdlib", "os", "json", "strutils", "math", "times"],
+register_template(TemplateDef("stdlib_multi5", ["stdlib", "os", "json", "strutils", "math", "times"],
     [
         "Write a Nim program combining os, json, strutils, math, and times to process {file}.",
         "Create a script using 5 stdlib modules to parse {file} in {dir}.",
@@ -1428,7 +1428,7 @@ proc processComplexData*(baseDir, filename: string) =
 
 when isMainModule:
   processComplexData("{dir}", "{file}")
-""", multi_gen)
+""", multi_gen))
 
 def multi2_gen():
     files = ["data.csv", "log.csv", "users.csv", "metrics.csv", "report.csv"]
@@ -1480,7 +1480,7 @@ when isMainModule:
   processCSV("{dir}", "{file}")
 """
 
-register_template("stdlib_multi_csv", ["stdlib", "os", "parsecsv", "strutils", "streams", "times"],
+register_template(TemplateDef("stdlib_multi_csv", ["stdlib", "os", "parsecsv", "strutils", "streams", "times"],
     [
         "Write a Nim program combining os, parsecsv, strutils, streams, and times to process {file}.",
         "Create a script using 5 stdlib modules to parse CSV {file} in {dir}.",
@@ -1488,7 +1488,7 @@ register_template("stdlib_multi_csv", ["stdlib", "os", "parsecsv", "strutils", "
         "Build a Nim module demonstrating os, parsecsv, strutils, streams, and times."
     ],
     "This example uses `os`, `parsecsv`, `strutils`, `streams`, and `times` together. We locate a CSV file with `os`, read it using `streams` and `parsecsv`, format the data with `strutils`, and measure the processing time using `times`. Integrating these modules covers typical data ingestion tasks.",
-    multi2_code, multi2_gen)
+    multi2_code, multi2_gen))
 
 def generate_examples(target_total=3000):
     seen_code_hashes = set()
